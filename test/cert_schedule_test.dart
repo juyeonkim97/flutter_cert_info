@@ -9,7 +9,7 @@ import 'dart:convert';
 
 import 'package:convert/convert.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_cert_info/model/cert_schedule.dart';
+import 'package:flutter_cert_info/models/cert_schedule.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:flutter_cert_info/main.dart';
