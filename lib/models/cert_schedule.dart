@@ -10,6 +10,10 @@ class CertScheduleResponse {
       body: Body.fromJson(json['body']),
     );
   }
+
+  List<Item> getItems() {
+    return body.items;
+  }
 }
 
 class Header {
@@ -42,7 +46,7 @@ class Body {
   factory Body.fromJson(Map<String, dynamic> json) {
     var itemsJson = json['items'] as List;
     List<Item> items =
-    itemsJson.map((itemJson) => Item.fromJson(itemJson)).toList();
+        itemsJson.map((itemJson) => Item.fromJson(itemJson)).toList();
     return Body(
       items: items,
       numOfRows: json['numOfRows'],
@@ -53,38 +57,38 @@ class Body {
 }
 
 class Item {
-  final String implYy;
-  final int implSeq;
-  final String qualgbCd;
-  final String qualgbNm;
-  final String description;
-  final String docRegStartDt;
-  final String docRegEndDt;
-  final String docExamStartDt;
-  final String docExamEndDt;
-  final String docPassDt;
-  final String pracRegStartDt;
-  final String pracRegEndDt;
-  final String pracExamStartDt;
-  final String pracExamEndDt;
-  final String pracPassDt;
+  final String? implYy;
+  final int? implSeq;
+  final String? qualgbCd;
+  final String? qualgbNm;
+  final String? description;
+  final String? docRegStartDt;
+  final String? docRegEndDt;
+  final String? docExamStartDt;
+  final String? docExamEndDt;
+  final String? docPassDt;
+  final String? pracRegStartDt;
+  final String? pracRegEndDt;
+  final String? pracExamStartDt;
+  final String? pracExamEndDt;
+  final String? pracPassDt;
 
   Item({
-    required this.implYy,
-    required this.implSeq,
-    required this.qualgbCd,
-    required this.qualgbNm,
-    required this.description,
-    required this.docRegStartDt,
-    required this.docRegEndDt,
-    required this.docExamStartDt,
-    required this.docExamEndDt,
-    required this.docPassDt,
-    required this.pracRegStartDt,
-    required this.pracRegEndDt,
-    required this.pracExamStartDt,
-    required this.pracExamEndDt,
-    required this.pracPassDt,
+    this.implYy,
+    this.implSeq,
+    this.qualgbCd,
+    this.qualgbNm,
+    this.description,
+    this.docRegStartDt,
+    this.docRegEndDt,
+    this.docExamStartDt,
+    this.docExamEndDt,
+    this.docPassDt,
+    this.pracRegStartDt,
+    this.pracRegEndDt,
+    this.pracExamStartDt,
+    this.pracExamEndDt,
+    this.pracPassDt,
   });
 
   factory Item.fromJson(Map<String, dynamic> json) {
@@ -105,5 +109,33 @@ class Item {
       pracExamEndDt: json['pracExamEndDt'],
       pracPassDt: json['pracPassDt'],
     );
+  }
+
+  String getFieldDescription(String fieldName) {
+    switch (fieldName) {
+      case 'implSeq':
+        return '제${implSeq}회 ';
+      case 'docRegStartDt':
+        return '필기 원서접수';
+      // case 'docRegEndDt':
+      //   return '필기 원서접수 종료';
+      case 'docExamStartDt':
+        return '필기 시험';
+      // case 'docExamEndDt':
+      //   return '필기 시험 종료';
+      case 'docPassDt':
+        return '필기 합격자 발표';
+      case 'pracRegStartDt':
+        return '실기 원서접수';
+      // case 'pracRegEndDt':
+      //   return '실기 원서접수 종료';
+      case 'pracExamStartDt':
+        return '실기 시험';
+      // case 'pracExamEndDt':
+      //   return '실기 시험 종료';
+      case 'pracPassDt':
+        return '실기 합격자 발표';
+    }
+    return 'null';
   }
 }
