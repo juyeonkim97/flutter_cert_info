@@ -25,8 +25,10 @@ class _CalendarPageState extends State<CalendarPage> {
   late String _appbarTitle;
   late String _monthName;
 
+  bool _showCalendar = true;
+  bool _isLoading = true;
+
   List<Item> items = [];
-  bool isLoading = true;
   CertScheduleProviders certScheduleProviders = CertScheduleProviders();
 
   Future initNews() async {
@@ -40,7 +42,7 @@ class _CalendarPageState extends State<CalendarPage> {
     _setTexts(_currentDate.year, _currentDate.month);
     initNews().then((_) {
       setState(() {
-        isLoading = false;
+        _isLoading = false;
       });
     });
     super.initState();
@@ -55,78 +57,120 @@ class _CalendarPageState extends State<CalendarPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        elevation: 0,
-        // centerTitle: false,
-        leading: IconButton(
-          tooltip: 'Change List View',
-          icon: const Icon(Icons.format_list_bulleted_outlined),
-          onPressed: _showCurrentMonth,
-        ),
-        title: Text(_appbarTitle),
-        actions: [
-          IconButton(
-            tooltip: 'Go to current date',
-            icon: const Icon(Icons.calendar_today),
-            onPressed: _showCurrentMonth,
-          ),
-        ],
-      ),
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: _addEvent,
-      //   child: const Icon(Icons.add),
-      // ),
-      body: isLoading
-          ? const Center(
-              child: CircularProgressIndicator(),
-            )
-          : Column(
-              children: [
-                /// Calendar control row.
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.arrow_back_ios),
-                      onPressed: () {
-                        _changeCalendarPage(showNext: false);
-                      },
-                    ),
-                    Text(
-                      _monthName,
-                      style: const TextStyle(
-                          fontSize: 16,
-                          color: violet,
-                          fontWeight: FontWeight.w600),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.arrow_forward_ios),
-                      onPressed: () {
-                        _changeCalendarPage(showNext: true);
-                      },
-                    ),
-                  ],
-                ),
-
-                /// Calendar view.
-                Expanded(
-                  child: CrCalendar(
-                    firstDayOfWeek: WeekDay.sunday,
-                    eventsTopPadding: 32,
-                    initialDate: _currentDate,
-                    maxEventLines: 3,
-                    controller: _calendarController,
-                    forceSixWeek: true,
-                    dayItemBuilder: (builderArgument) =>
-                        DayItemWidget(properties: builderArgument),
-                    weekDaysBuilder: (day) => WeekDaysWidget(day: day),
-                    eventBuilder: (drawer) => EventWidget(drawer: drawer),
-                    onDayClicked: _showDayEventsInModalSheet,
+        resizeToAvoidBottomInset: false,
+        appBar: AppBar(
+          elevation: 0,
+          centerTitle: false,
+          leading: IconButton(
+              tooltip: 'Change List View',
+              icon: const Icon(Icons.format_list_bulleted_outlined),
+              onPressed: () {
+                setState(() {
+                  _showCalendar = !_showCalendar;
+                });
+              }),
+          title: _showCalendar ? Text(_appbarTitle) : null,
+          actions: _showCalendar
+              ? [
+                  IconButton(
+                    tooltip: 'Go to current date',
+                    icon: const Icon(Icons.calendar_today),
+                    onPressed: _showCurrentMonth,
                   ),
-                ),
-              ],
+                ]
+              : null,
+        ),
+        // floatingActionButton: FloatingActionButton(
+        //   onPressed: _addEvent,
+        //   child: const Icon(Icons.add),
+        // ),
+        body: _isLoading // 로딩 중이지 않건
+            ? const Center(
+                child: CircularProgressIndicator(),
+              )
+            : _showCalendar
+                ? calendarWidget()
+                : buildText());
+  }
+
+  Widget buildText() {
+    return ListView.builder(
+        itemCount: items.length,
+        itemBuilder: (BuildContext context, int index) {
+          final item = items[index];
+          return ExpansionTile(
+            textColor: eventColors[0],
+            title: Text(item.getFieldDescription('implSeq'),
+                style:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
+            children: <Widget>[
+              ListTile(
+                  title: Text(
+                      '${item.getFieldDescription('docRegStartDt')} : ${item.docRegStartDt} ~ ${item.docRegEndDt}')),
+              ListTile(
+                  title: Text(
+                      '${item.getFieldDescription('docExamStartDt')} : ${item.docExamStartDt} ~ ${item.docExamEndDt}')),
+              ListTile(
+                  title: Text(
+                      '${item.getFieldDescription('docPassDt')} : ${item.docPassDt}')),
+              ListTile(
+                  title: Text(
+                      '${item.getFieldDescription('pracRegStartDt')} : ${item.pracRegStartDt} ~ ${item.pracRegEndDt}')),
+              ListTile(
+                  title: Text(
+                      '${item.getFieldDescription('pracExamStartDt')} : ${item.pracExamStartDt} ~ ${item.pracExamEndDt}')),
+              ListTile(
+                  title: Text(
+                      '${item.getFieldDescription('pracPassDt')} : ${item.pracPassDt}')),
+            ],
+          );
+        });
+  }
+
+  Widget calendarWidget() {
+    return Column(
+      children: [
+        /// Calendar control row.
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            IconButton(
+              icon: const Icon(Icons.arrow_back_ios),
+              onPressed: () {
+                _changeCalendarPage(showNext: false);
+              },
             ),
+            Text(
+              _monthName,
+              style: const TextStyle(
+                  fontSize: 16, color: violet, fontWeight: FontWeight.w600),
+            ),
+            IconButton(
+              icon: const Icon(Icons.arrow_forward_ios),
+              onPressed: () {
+                _changeCalendarPage(showNext: true);
+              },
+            ),
+          ],
+        ),
+
+        /// Calendar view.
+        Expanded(
+          child: CrCalendar(
+            firstDayOfWeek: WeekDay.sunday,
+            eventsTopPadding: 32,
+            initialDate: _currentDate,
+            maxEventLines: 3,
+            controller: _calendarController,
+            forceSixWeek: true,
+            dayItemBuilder: (builderArgument) =>
+                DayItemWidget(properties: builderArgument),
+            weekDaysBuilder: (day) => WeekDaysWidget(day: day),
+            eventBuilder: (drawer) => EventWidget(drawer: drawer),
+            onDayClicked: _showDayEventsInModalSheet,
+          ),
+        ),
+      ],
     );
   }
 
@@ -153,23 +197,6 @@ class _CalendarPageState extends State<CalendarPage> {
     _calendarController.goToDate(_currentDate);
   }
 
-  // /// Show [CreateEventDialog] with settings for new event.
-  // Future<void> _addEvent() async {
-  //   final event = await showDialog(
-  //       context: context, builder: (context) => const CreateEventDialog());
-  //   if (event != null) {
-  //     _calendarController.addEvent(event);
-  //   }
-  // }
-
-  // void _createExampleEvents() {
-  //   final now = _currentDate;
-  //   _calendarController = CrCalendarController(
-  //     onSwipe: _onCalendarPageChanged,
-  //     events: createEvents(now),
-  //   );
-  // }
-
   void fetchEvents() {
     List<CalendarEventModel> events = [];
 
@@ -180,7 +207,7 @@ class _CalendarPageState extends State<CalendarPage> {
           name: element.getFieldDescription("implSeq") +
               element.getFieldDescription("docRegStartDt"),
           begin: DateTime.parse(element.docRegStartDt ?? ""),
-          end: DateTime.parse(element.docExamEndDt ?? ""),
+          end: DateTime.parse(element.docRegEndDt ?? ""),
           eventColor: eventColors[0],
         );
         events.add(calendarEventModel);
@@ -245,41 +272,6 @@ class _CalendarPageState extends State<CalendarPage> {
       onSwipe: _onCalendarPageChanged,
       events: events,
     );
-  }
-
-  List<CalendarEventModel> createEvents(DateTime now) {
-    return [
-      CalendarEventModel(
-        name: '1 event',
-        begin: DateTime(now.year, now.month, (now.day).clamp(1, 28)),
-        end: DateTime(now.year, now.month, (now.day).clamp(1, 28)),
-        eventColor: eventColors[0],
-      ),
-      CalendarEventModel(
-        name: '2 event',
-        begin: DateTime(now.year, now.month - 1, (now.day - 2).clamp(1, 28)),
-        end: DateTime(now.year, now.month, (now.day + 2).clamp(1, 28)),
-        eventColor: eventColors[1],
-      ),
-      CalendarEventModel(
-        name: '3 event',
-        begin: DateTime(now.year, now.month, (now.day - 3).clamp(1, 28)),
-        end: DateTime(now.year, now.month + 1, (now.day + 4).clamp(1, 28)),
-        eventColor: eventColors[2],
-      ),
-      CalendarEventModel(
-        name: '4 event',
-        begin: DateTime(now.year, now.month - 1, (now.day).clamp(1, 28)),
-        end: DateTime(now.year, now.month + 1, (now.day + 5).clamp(1, 28)),
-        eventColor: eventColors[3],
-      ),
-      CalendarEventModel(
-        name: '5 event',
-        begin: DateTime(now.year, now.month + 1, (now.day + 1).clamp(1, 28)),
-        end: DateTime(now.year, now.month + 2, (now.day + 7).clamp(1, 28)),
-        eventColor: eventColors[4],
-      ),
-    ];
   }
 
   void _showDayEventsInModalSheet(
