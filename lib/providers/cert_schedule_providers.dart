@@ -13,7 +13,7 @@ class CertScheduleProviders {
   Future<List<Item>> fetchCertSchedule(int year, String jmCd) async {
     final result = await dio.get(url, queryParameters: {
       "serviceKey": dotenv.env['SCHEDULE_SERVICE_KEY'],
-      "numOfRows": 1,
+      "numOfRows": 2,
       "pageNo": 1,
       "dataFormat": "json",
       "implYy": year,
@@ -70,6 +70,8 @@ class CertScheduleProviders {
     // ''';
     var jsonResponse = jsonDecode(result.toString());
     final response = CertScheduleResponse.fromJson(jsonResponse);
-    return response.getItems();
+    var items = response.getItems();
+    items.sort((a, b) => a.implSeq.compareTo(b.implSeq));
+    return items;
   }
 }

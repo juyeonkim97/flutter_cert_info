@@ -57,8 +57,8 @@ class Body {
 }
 
 class Item {
-  final String? implYy;
-  final int? implSeq;
+  final String implYy;
+  final int implSeq;
   final String? qualgbCd;
   final String? qualgbNm;
   final String? description;
@@ -74,8 +74,8 @@ class Item {
   final String? pracPassDt;
 
   Item({
-    this.implYy,
-    this.implSeq,
+    required this.implYy,
+    required this.implSeq,
     this.qualgbCd,
     this.qualgbNm,
     this.description,
