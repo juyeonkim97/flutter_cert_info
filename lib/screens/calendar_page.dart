@@ -1,6 +1,8 @@
 import 'package:cr_calendar/cr_calendar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cert_info/models/cert_schedule.dart';
+import 'package:flutter_cert_info/models/cert_type.dart';
+import 'package:flutter_cert_info/providers/cert_type_provider.dart';
 import 'package:flutter_cert_info/utills/extensions.dart';
 
 import '../providers/cert_schedule_providers.dart';
@@ -21,26 +23,35 @@ class CalendarPage extends StatefulWidget {
 
 class _CalendarPageState extends State<CalendarPage> {
   final _currentDate = DateTime.now();
-  late CrCalendarController _calendarController;
-  late String _appbarTitle;
-  late String _monthName;
+  late String _viewDate;
+  late String _selectedCertType;
 
+  // 아이템 종목 관련
+  CertTypeProvider certTypeProvider = CertTypeProvider();
+  CertType initialCertType = CertType(jmcd: '1320', jmfldnm: '정보처리기사');
+  List<CertType> _certTypeList = [];
+
+  // 캘린더 관련
+  late CrCalendarController _calendarController;
+  CertScheduleProviders certScheduleProviders = CertScheduleProviders();
   bool _showCalendar = true;
   bool _isLoading = true;
+  List<CertSchedule> _scheduleList = [];
 
-  List<Item> items = [];
-  CertScheduleProviders certScheduleProviders = CertScheduleProviders();
-
-  Future initNews() async {
-    items = await certScheduleProviders.fetchCertSchedule(
-        _currentDate.year, "7910");
+  Future initCalendar(String jmcd) async {
+    var list =
+        await certScheduleProviders.fetchCertSchedule(_currentDate.year, jmcd);
+    setState(() {
+      _scheduleList = list;
+    });
     fetchEvents();
   }
 
   @override
   void initState() {
+    _selectedCertType = initialCertType.jmfldnm;
     _setTexts(_currentDate.year, _currentDate.month);
-    initNews().then((_) {
+    initCalendar(initialCertType.jmcd).then((_) {
       setState(() {
         _isLoading = false;
       });
@@ -69,7 +80,14 @@ class _CalendarPageState extends State<CalendarPage> {
                   _showCalendar = !_showCalendar;
                 });
               }),
-          title: _showCalendar ? Text(_appbarTitle) : null,
+          title: Row(
+            children: [
+              Text(_selectedCertType),
+              IconButton(
+                  icon: Icon(Icons.arrow_drop_down),
+                  onPressed: _showCertTypeListInModalSheet),
+            ],
+          ),
           actions: _showCalendar
               ? [
                   IconButton(
@@ -80,25 +98,22 @@ class _CalendarPageState extends State<CalendarPage> {
                 ]
               : null,
         ),
-        // floatingActionButton: FloatingActionButton(
-        //   onPressed: _addEvent,
-        //   child: const Icon(Icons.add),
-        // ),
-        body: _isLoading // 로딩 중이지 않건
+        body: _isLoading
             ? const Center(
                 child: CircularProgressIndicator(),
               )
             : _showCalendar
                 ? calendarWidget()
-                : buildText());
+                : listViewWidget());
   }
 
-  Widget buildText() {
+  Widget listViewWidget() {
     return ListView.builder(
-        itemCount: items.length,
+        itemCount: _scheduleList.length,
         itemBuilder: (BuildContext context, int index) {
-          final item = items[index];
+          final item = _scheduleList[index];
           return ExpansionTile(
+            backgroundColor: Colors.white,
             textColor: eventColors[0],
             title: Text(item.getFieldDescription('implSeq'),
                 style:
@@ -128,49 +143,52 @@ class _CalendarPageState extends State<CalendarPage> {
   }
 
   Widget calendarWidget() {
-    return Column(
-      children: [
-        /// Calendar control row.
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            IconButton(
-              icon: const Icon(Icons.arrow_back_ios),
-              onPressed: () {
-                _changeCalendarPage(showNext: false);
-              },
-            ),
-            Text(
-              _monthName,
-              style: const TextStyle(
-                  fontSize: 16, color: violet, fontWeight: FontWeight.w600),
-            ),
-            IconButton(
-              icon: const Icon(Icons.arrow_forward_ios),
-              onPressed: () {
-                _changeCalendarPage(showNext: true);
-              },
-            ),
-          ],
-        ),
-
-        /// Calendar view.
-        Expanded(
-          child: CrCalendar(
-            firstDayOfWeek: WeekDay.sunday,
-            eventsTopPadding: 32,
-            initialDate: _currentDate,
-            maxEventLines: 3,
-            controller: _calendarController,
-            forceSixWeek: true,
-            dayItemBuilder: (builderArgument) =>
-                DayItemWidget(properties: builderArgument),
-            weekDaysBuilder: (day) => WeekDaysWidget(day: day),
-            eventBuilder: (drawer) => EventWidget(drawer: drawer),
-            onDayClicked: _showDayEventsInModalSheet,
+    return Container(
+      color: Colors.white,
+      child: Column(
+        children: [
+          /// Calendar control row.
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.arrow_back_ios),
+                onPressed: () {
+                  _changeCalendarPage(showNext: false);
+                },
+              ),
+              Text(
+                _viewDate,
+                style:
+                    const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+              ),
+              IconButton(
+                icon: const Icon(Icons.arrow_forward_ios),
+                onPressed: () {
+                  _changeCalendarPage(showNext: true);
+                },
+              ),
+            ],
           ),
-        ),
-      ],
+
+          /// Calendar view.
+          Expanded(
+            child: CrCalendar(
+              firstDayOfWeek: WeekDay.sunday,
+              eventsTopPadding: 32,
+              initialDate: _currentDate,
+              maxEventLines: 3,
+              controller: _calendarController,
+              forceSixWeek: true,
+              dayItemBuilder: (builderArgument) =>
+                  DayItemWidget(properties: builderArgument),
+              weekDaysBuilder: (day) => WeekDaysWidget(day: day),
+              eventBuilder: (drawer) => EventWidget(drawer: drawer),
+              onDayClicked: _showDayEventsInModalSheet,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -188,8 +206,7 @@ class _CalendarPageState extends State<CalendarPage> {
   /// Set app bar text and month name over calendar.
   void _setTexts(int year, int month) {
     final date = DateTime(year, month);
-    _appbarTitle = date.format(kAppBarDateFormat);
-    _monthName = date.format(kMonthFormat);
+    _viewDate = date.format(kAppBarDateFormat);
   }
 
   /// Show current month page.
@@ -198,9 +215,9 @@ class _CalendarPageState extends State<CalendarPage> {
   }
 
   void fetchEvents() {
-    List<CalendarEventModel> events = [];
+    List<CalendarEventModel> events = List.empty(growable: true);
 
-    items.forEach((element) {
+    _scheduleList.forEach((element) {
       // 필기 원서접수
       if (element.docRegStartDt != "") {
         var calendarEventModel = CalendarEventModel(
@@ -286,5 +303,36 @@ class _CalendarPageState extends State<CalendarPage> {
               day: day,
               screenHeight: MediaQuery.of(context).size.height,
             ));
+  }
+
+  Future<void> _showCertTypeListInModalSheet() async {
+    _certTypeList = await certTypeProvider.fetchCertType();
+    // showModalBottomSheet 사용하여 선택 가능한 항목 표시
+    final result = showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return ListView.builder(
+          itemCount: _certTypeList.length,
+          itemBuilder: (BuildContext context, int index) {
+            final item = _certTypeList[index];
+            return ListTile(
+              title: Text(item.jmfldnm),
+              onTap: () => onTap(item),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void onTap(CertType item) {
+    if (_selectedCertType != item.jmfldnm) {
+      setState(() {
+        _selectedCertType = item.jmfldnm;
+        // _showCalendar = true;
+      });
+      initCalendar(item.jmcd);
+      Navigator.pop(context);
+    }
   }
 }
