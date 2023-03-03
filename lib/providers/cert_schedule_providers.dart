@@ -10,10 +10,11 @@ class CertScheduleProviders {
   final url = "http://apis.data.go.kr/B490007/qualExamSchd/getQualExamSchdList";
   final dio = Dio();
 
-  Future<List<Item>> fetchCertSchedule(int year, String jmCd) async {
+  Future<List<CertSchedule>> fetchCertSchedule(int year, String jmCd) async {
+    print('종목 코드 ${jmCd} 의 시험 일정을 조회합니다...');
     final result = await dio.get(url, queryParameters: {
       "serviceKey": dotenv.env['SCHEDULE_SERVICE_KEY'],
-      "numOfRows": 2,
+      "numOfRows": 30,
       "pageNo": 1,
       "dataFormat": "json",
       "implYy": year,
