@@ -11,7 +11,7 @@ class CertScheduleResponse {
     );
   }
 
-  List<CertSchedule> getItems() {
+  List<Item> getItems() {
     return body.items;
   }
 }
@@ -31,7 +31,7 @@ class Header {
 }
 
 class Body {
-  final List<CertSchedule> items;
+  final List<Item> items;
   final int numOfRows;
   final int pageNo;
   final int totalCount;
@@ -45,8 +45,8 @@ class Body {
 
   factory Body.fromJson(Map<String, dynamic> json) {
     var itemsJson = json['items'] as List;
-    List<CertSchedule> items =
-        itemsJson.map((itemJson) => CertSchedule.fromJson(itemJson)).toList();
+    List<Item> items =
+        itemsJson.map((itemJson) => Item.fromJson(itemJson)).toList();
     return Body(
       items: items,
       numOfRows: json['numOfRows'],
@@ -56,7 +56,7 @@ class Body {
   }
 }
 
-class CertSchedule {
+class Item {
   final String implYy;
   final int implSeq;
   final String? qualgbCd;
@@ -73,7 +73,7 @@ class CertSchedule {
   final String? pracExamEndDt;
   final String? pracPassDt;
 
-  CertSchedule({
+  Item({
     required this.implYy,
     required this.implSeq,
     this.qualgbCd,
@@ -91,8 +91,8 @@ class CertSchedule {
     this.pracPassDt,
   });
 
-  factory CertSchedule.fromJson(Map<String, dynamic> json) {
-    return CertSchedule(
+  factory Item.fromJson(Map<String, dynamic> json) {
+    return Item(
       implYy: json['implYy'],
       implSeq: json['implSeq'],
       qualgbCd: json['qualgbCd'],
