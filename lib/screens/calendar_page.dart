@@ -1,15 +1,11 @@
 import 'package:cr_calendar/cr_calendar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cert_info/models/cert_schedule.dart';
-import 'package:flutter_cert_info/utills/extensions.dart';
+import 'package:flutter_cert_info/models/cert_type.dart';
+import 'package:flutter_cert_info/widgets/calendar_widget.dart';
 
 import '../providers/cert_schedule_providers.dart';
 import '../res/colors.dart';
-import '../utills/constants.dart';
-import '../widgets/day_events_bottom_sheet.dart';
-import '../widgets/day_item_widget.dart';
-import '../widgets/event_widget.dart';
-import '../widgets/week_days_widget.dart';
 
 /// Main calendar page.
 class CalendarPage extends StatefulWidget {
@@ -21,159 +17,114 @@ class CalendarPage extends StatefulWidget {
 
 class _CalendarPageState extends State<CalendarPage> {
   final _currentDate = DateTime.now();
-  late CrCalendarController _calendarController;
-  late String _appbarTitle;
-  late String _monthName;
+  final _initialCertType = CertType(jmcd: "7910", jmfldnm: "정보처리기사");
 
-  List<Item> items = [];
-  bool isLoading = true;
-  CertScheduleProviders certScheduleProviders = CertScheduleProviders();
+  final CertScheduleProviders _certScheduleProviders = CertScheduleProviders();
 
-  Future initNews() async {
-    items = await certScheduleProviders.fetchCertSchedule(
-        _currentDate.year, "7910");
-    fetchEvents();
-  }
+  late String _viewCertType;
+  late List<CertSchedule> _schedules;
+  late Widget _calendarWidget;
+
+  List<CalendarEventModel> _events = [];
+  bool _isLoading = true;
+  bool _showCalendar = true;
 
   @override
   void initState() {
-    _setTexts(_currentDate.year, _currentDate.month);
-    initNews().then((_) {
+    super.initState();
+    _viewCertType = _initialCertType.jmfldnm;
+    _fetchCertSchedule().then((_) {
       setState(() {
-        isLoading = false;
+        _isLoading = false;
       });
     });
-    super.initState();
   }
 
   @override
   void dispose() {
-    _calendarController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        elevation: 0,
-        // centerTitle: false,
-        leading: IconButton(
-          tooltip: 'Change List View',
-          icon: const Icon(Icons.format_list_bulleted_outlined),
-          onPressed: _showCurrentMonth,
-        ),
-        title: Text(_appbarTitle),
-        actions: [
-          IconButton(
-            tooltip: 'Go to current date',
-            icon: const Icon(Icons.calendar_today),
-            onPressed: _showCurrentMonth,
-          ),
-        ],
-      ),
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: _addEvent,
-      //   child: const Icon(Icons.add),
-      // ),
-      body: isLoading
-          ? const Center(
-              child: CircularProgressIndicator(),
-            )
-          : Column(
-              children: [
-                /// Calendar control row.
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.arrow_back_ios),
-                      onPressed: () {
-                        _changeCalendarPage(showNext: false);
-                      },
-                    ),
-                    Text(
-                      _monthName,
-                      style: const TextStyle(
-                          fontSize: 16,
-                          color: violet,
-                          fontWeight: FontWeight.w600),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.arrow_forward_ios),
-                      onPressed: () {
-                        _changeCalendarPage(showNext: true);
-                      },
-                    ),
-                  ],
-                ),
-
-                /// Calendar view.
-                Expanded(
-                  child: CrCalendar(
-                    firstDayOfWeek: WeekDay.sunday,
-                    eventsTopPadding: 32,
-                    initialDate: _currentDate,
-                    maxEventLines: 3,
-                    controller: _calendarController,
-                    forceSixWeek: true,
-                    dayItemBuilder: (builderArgument) =>
-                        DayItemWidget(properties: builderArgument),
-                    weekDaysBuilder: (day) => WeekDaysWidget(day: day),
-                    eventBuilder: (drawer) => EventWidget(drawer: drawer),
-                    onDayClicked: _showDayEventsInModalSheet,
-                  ),
-                ),
-              ],
+        resizeToAvoidBottomInset: false,
+        appBar: AppBar(
+            elevation: 0,
+            // centerTitle: false,
+            leading: IconButton(
+              tooltip: 'Change List View',
+              icon: const Icon(Icons.format_list_bulleted_outlined),
+              onPressed: () {
+                setState(() {
+                  _showCalendar = !_showCalendar;
+                });
+              },
             ),
-    );
+            title: Text(_viewCertType)),
+        body: _isLoading
+            ? const Center(
+                child: CircularProgressIndicator(),
+              )
+            : Stack(
+                children: [
+                  Visibility(
+                    visible: _showCalendar,
+                    maintainState: true,
+                    child: _calendarWidget,
+                  ),
+                  Visibility(
+                    visible: !_showCalendar,
+                    maintainState: true,
+                    child: _listWidget(),
+                  ),
+                ],
+              ));
   }
 
-  /// Control calendar with arrow buttons.
-  void _changeCalendarPage({required bool showNext}) => showNext
-      ? _calendarController.swipeToNextMonth()
-      : _calendarController.swipeToPreviousPage();
-
-  void _onCalendarPageChanged(int year, int month) {
-    setState(() {
-      _setTexts(year, month);
-    });
+  Future _fetchCertSchedule() async {
+    _schedules = await _certScheduleProviders.fetchCertSchedule(
+        _currentDate.year, _initialCertType.jmcd);
+    _createEventModels();
+    _calendarWidget = CalendarWidget(events: _events);
   }
 
-  /// Set app bar text and month name over calendar.
-  void _setTexts(int year, int month) {
-    final date = DateTime(year, month);
-    _appbarTitle = date.format(kAppBarDateFormat);
-    _monthName = date.format(kMonthFormat);
+  Widget _listWidget() {
+    return ListView.builder(
+        itemCount: _schedules.length,
+        itemBuilder: (BuildContext context, int index) {
+          final item = _schedules[index];
+          return ExpansionTile(
+            textColor: eventColors[0],
+            title: Text(item.getFieldDescription('implSeq'),
+                style:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
+            children: <Widget>[
+              ListTile(
+                  title: Text(
+                      '${item.getFieldDescription('docRegStartDt')} : ${item.docRegStartDt} ~ ${item.docRegEndDt}')),
+              ListTile(
+                  title: Text(
+                      '${item.getFieldDescription('docExamStartDt')} : ${item.docExamStartDt} ~ ${item.docExamEndDt}')),
+              ListTile(
+                  title: Text(
+                      '${item.getFieldDescription('docPassDt')} : ${item.docPassDt}')),
+              ListTile(
+                  title: Text(
+                      '${item.getFieldDescription('pracRegStartDt')} : ${item.pracRegStartDt} ~ ${item.pracRegEndDt}')),
+              ListTile(
+                  title: Text(
+                      '${item.getFieldDescription('pracExamStartDt')} : ${item.pracExamStartDt} ~ ${item.pracExamEndDt}')),
+              ListTile(
+                  title: Text(
+                      '${item.getFieldDescription('pracPassDt')} : ${item.pracPassDt}')),
+            ],
+          );
+        });
   }
 
-  /// Show current month page.
-  void _showCurrentMonth() {
-    _calendarController.goToDate(_currentDate);
-  }
-
-  // /// Show [CreateEventDialog] with settings for new event.
-  // Future<void> _addEvent() async {
-  //   final event = await showDialog(
-  //       context: context, builder: (context) => const CreateEventDialog());
-  //   if (event != null) {
-  //     _calendarController.addEvent(event);
-  //   }
-  // }
-
-  // void _createExampleEvents() {
-  //   final now = _currentDate;
-  //   _calendarController = CrCalendarController(
-  //     onSwipe: _onCalendarPageChanged,
-  //     events: createEvents(now),
-  //   );
-  // }
-
-  void fetchEvents() {
-    List<CalendarEventModel> events = [];
-
-    items.forEach((element) {
+  void _createEventModels() {
+    _schedules.forEach((element) {
       // 필기 원서접수
       if (element.docRegStartDt != "") {
         var calendarEventModel = CalendarEventModel(
@@ -183,7 +134,7 @@ class _CalendarPageState extends State<CalendarPage> {
           end: DateTime.parse(element.docExamEndDt ?? ""),
           eventColor: eventColors[0],
         );
-        events.add(calendarEventModel);
+        _events.add(calendarEventModel);
       }
       // 필기 시험
       if (element.docExamStartDt != "") {
@@ -194,7 +145,7 @@ class _CalendarPageState extends State<CalendarPage> {
           end: DateTime.parse(element.docExamEndDt ?? ""),
           eventColor: eventColors[0],
         );
-        events.add(calendarEventModel);
+        _events.add(calendarEventModel);
       }
       // 필기 합격자 발표
       if (element.docPassDt != "") {
@@ -205,7 +156,7 @@ class _CalendarPageState extends State<CalendarPage> {
           end: DateTime.parse(element.docPassDt ?? ""),
           eventColor: eventColors[0],
         );
-        events.add(calendarEventModel);
+        _events.add(calendarEventModel);
       }
       // 실기 원서 접수
       if (element.pracRegStartDt != "") {
@@ -216,7 +167,7 @@ class _CalendarPageState extends State<CalendarPage> {
           end: DateTime.parse(element.pracRegEndDt ?? ""),
           eventColor: eventColors[0],
         );
-        events.add(calendarEventModel);
+        _events.add(calendarEventModel);
       }
       // 실기 시험
       if (element.pracExamStartDt != "") {
@@ -227,7 +178,7 @@ class _CalendarPageState extends State<CalendarPage> {
           end: DateTime.parse(element.pracExamEndDt ?? ""),
           eventColor: eventColors[0],
         );
-        events.add(calendarEventModel);
+        _events.add(calendarEventModel);
       }
       // 실기 합격자 발표
       if (element.pracPassDt != "") {
@@ -238,61 +189,8 @@ class _CalendarPageState extends State<CalendarPage> {
           end: DateTime.parse(element.pracPassDt ?? ""),
           eventColor: eventColors[0],
         );
-        events.add(calendarEventModel);
+        _events.add(calendarEventModel);
       }
     });
-    _calendarController = CrCalendarController(
-      onSwipe: _onCalendarPageChanged,
-      events: events,
-    );
-  }
-
-  List<CalendarEventModel> createEvents(DateTime now) {
-    return [
-      CalendarEventModel(
-        name: '1 event',
-        begin: DateTime(now.year, now.month, (now.day).clamp(1, 28)),
-        end: DateTime(now.year, now.month, (now.day).clamp(1, 28)),
-        eventColor: eventColors[0],
-      ),
-      CalendarEventModel(
-        name: '2 event',
-        begin: DateTime(now.year, now.month - 1, (now.day - 2).clamp(1, 28)),
-        end: DateTime(now.year, now.month, (now.day + 2).clamp(1, 28)),
-        eventColor: eventColors[1],
-      ),
-      CalendarEventModel(
-        name: '3 event',
-        begin: DateTime(now.year, now.month, (now.day - 3).clamp(1, 28)),
-        end: DateTime(now.year, now.month + 1, (now.day + 4).clamp(1, 28)),
-        eventColor: eventColors[2],
-      ),
-      CalendarEventModel(
-        name: '4 event',
-        begin: DateTime(now.year, now.month - 1, (now.day).clamp(1, 28)),
-        end: DateTime(now.year, now.month + 1, (now.day + 5).clamp(1, 28)),
-        eventColor: eventColors[3],
-      ),
-      CalendarEventModel(
-        name: '5 event',
-        begin: DateTime(now.year, now.month + 1, (now.day + 1).clamp(1, 28)),
-        end: DateTime(now.year, now.month + 2, (now.day + 7).clamp(1, 28)),
-        eventColor: eventColors[4],
-      ),
-    ];
-  }
-
-  void _showDayEventsInModalSheet(
-      List<CalendarEventModel> events, DateTime day) {
-    showModalBottomSheet(
-        shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(top: Radius.circular(8))),
-        isScrollControlled: true,
-        context: context,
-        builder: (context) => DayEventsBottomSheet(
-              events: events,
-              day: day,
-              screenHeight: MediaQuery.of(context).size.height,
-            ));
   }
 }
