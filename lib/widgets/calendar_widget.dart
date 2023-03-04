@@ -29,8 +29,8 @@ class _CalendarWidgetState extends State<CalendarWidget> {
   void initState() {
     super.initState();
     _setTexts(_currentDate.year, _currentDate.month);
-    _controller =
-        CrCalendarController(events: widget.events, onSwipe: _onCalendarPageChanged);
+    _controller = CrCalendarController(
+        events: widget.events, onSwipe: _onCalendarPageChanged);
   }
 
   @override
@@ -41,50 +41,50 @@ class _CalendarWidgetState extends State<CalendarWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        /// Calendar control row.
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            IconButton(
-              icon: const Icon(Icons.arrow_back_ios),
-              onPressed: () {
-                _changeCalendarPage(showNext: false);
-              },
-            ),
-            Text(
-              _viewDate,
-              // _controller.date.format(kMonthFormat),
-              style: const TextStyle(
-                  fontSize: 16, color: violet, fontWeight: FontWeight.w600),
-            ),
-            IconButton(
-              icon: const Icon(Icons.arrow_forward_ios),
-              onPressed: () {
-                _changeCalendarPage(showNext: true);
-              },
-            ),
-          ],
-        ),
+    return Container(
+        color: Colors.white,
+        child: Column(children: [
+          /// Calendar control row.
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.arrow_back_ios),
+                onPressed: () {
+                  _changeCalendarPage(showNext: false);
+                },
+              ),
+              Text(
+                _viewDate,
+                // _controller.date.format(kMonthFormat),
+                style: const TextStyle(
+                    fontSize: 16, color: violet, fontWeight: FontWeight.w600),
+              ),
+              IconButton(
+                icon: const Icon(Icons.arrow_forward_ios),
+                onPressed: () {
+                  _changeCalendarPage(showNext: true);
+                },
+              ),
+            ],
+          ),
 
-        /// Calendar view.
-        Expanded(
-            child: CrCalendar(
-          firstDayOfWeek: WeekDay.sunday,
-          eventsTopPadding: 32,
-          initialDate: _currentDate,
-          maxEventLines: 3,
-          controller: _controller,
-          forceSixWeek: true,
-          dayItemBuilder: (builderArgument) =>
-              DayItemWidget(properties: builderArgument),
-          weekDaysBuilder: (day) => WeekDaysWidget(day: day),
-          eventBuilder: (drawer) => EventWidget(drawer: drawer),
-          onDayClicked: _showDayEventsInModalSheet,
-        )),
-      ],
-    );
+          /// Calendar view.
+          Expanded(
+              child: CrCalendar(
+            firstDayOfWeek: WeekDay.sunday,
+            eventsTopPadding: 32,
+            initialDate: _currentDate,
+            maxEventLines: 3,
+            controller: _controller,
+            forceSixWeek: true,
+            dayItemBuilder: (builderArgument) =>
+                DayItemWidget(properties: builderArgument),
+            weekDaysBuilder: (day) => WeekDaysWidget(day: day),
+            eventBuilder: (drawer) => EventWidget(drawer: drawer),
+            onDayClicked: _showDayEventsInModalSheet,
+          )),
+        ]));
   }
 
   void _setTexts(int year, int month) {

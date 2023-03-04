@@ -1,6 +1,6 @@
 import 'package:cr_calendar/cr_calendar.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_cert_info/utills/extensions.dart';
 
 import '../res/colors.dart';
 
@@ -20,12 +20,18 @@ class WeekDaysWidget extends StatelessWidget {
       height: 40,
       child: Center(
         child: Text(
-          describeEnum(day).substring(0, 3).toUpperCase(),
+          day.convertKo(),
           style: TextStyle(
-            color: violet.withOpacity(0.9),
+            color: isSunday()
+                ? Colors.red.withOpacity(0.9)
+                : violet.withOpacity(0.9),
           ),
         ),
       ),
     );
+  }
+
+  bool isSunday() {
+    return WeekDay.sunday == day;
   }
 }

@@ -1,0 +1,34 @@
+[
+  {
+    "jmcd": "0740",
+    "jmfldnm": "건설안전기술사",
+    "qualgbcd": "T",
+    "qualgbnm": "국가기술자격",
+    "seriescd": 1,
+    "seriesnm": "기술사"
+  },
+  {
+    "jmcd": "0490",
+    "jmfldnm": "건축구조기술사",
+    "qualgbcd": "T",
+    "qualgbnm": "국가기술자격",
+    "seriescd": 1,
+    "seriesnm": "기술사"
+  },
+  {
+    "jmcd": "0501",
+    "jmfldnm": "건축기계설비기술사",
+    "qualgbcd": "T",
+    "qualgbnm": "국가기술자격",
+    "seriescd": 1,
+    "seriesnm": "기술사"
+  },
+  {
+    "jmcd": "1340",
+    "jmfldnm": "에너지관리기사",
+    "qualgbcd": "T",
+    "qualgbnm": "국가기술자격",
+    "seriescd": 1,
+    "seriesnm": "기술사"
+  }
+]
