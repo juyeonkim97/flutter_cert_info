@@ -107,7 +107,7 @@ class _CalendarPageState extends State<CalendarPage> {
             itemBuilder: (BuildContext context, int index) {
               final item = _schedules[index];
               return ExpansionTile(
-                textColor: eventColors[0],
+                textColor: eventColors[index % 6],
                 title: Text(item.getFieldDescription('implSeq'),
                     style: const TextStyle(
                         fontSize: 18, fontWeight: FontWeight.w500)),
@@ -139,7 +139,8 @@ class _CalendarPageState extends State<CalendarPage> {
     if (_events.isNotEmpty) {
       _events.clear();
     }
-    _schedules.forEach((element) {
+    _schedules.asMap().forEach((index, element) {
+      final eventColor = eventColors[index % 6];
       // 필기 원서접수
       if (element.docRegStartDt != "") {
         var calendarEventModel = CalendarEventModel(
@@ -147,7 +148,7 @@ class _CalendarPageState extends State<CalendarPage> {
               element.getFieldDescription("docRegStartDt"),
           begin: DateTime.parse(element.docRegStartDt ?? ""),
           end: DateTime.parse(element.docExamEndDt ?? ""),
-          eventColor: eventColors[0],
+          eventColor: eventColor,
         );
         _events.add(calendarEventModel);
       }
@@ -158,7 +159,7 @@ class _CalendarPageState extends State<CalendarPage> {
               element.getFieldDescription("docExamStartDt"),
           begin: DateTime.parse(element.docExamStartDt ?? ""),
           end: DateTime.parse(element.docExamEndDt ?? ""),
-          eventColor: eventColors[0],
+          eventColor: eventColor,
         );
         _events.add(calendarEventModel);
       }
@@ -169,7 +170,7 @@ class _CalendarPageState extends State<CalendarPage> {
               element.getFieldDescription("docPassDt"),
           begin: DateTime.parse(element.docPassDt ?? ""),
           end: DateTime.parse(element.docPassDt ?? ""),
-          eventColor: eventColors[0],
+          eventColor: eventColor,
         );
         _events.add(calendarEventModel);
       }
@@ -180,7 +181,7 @@ class _CalendarPageState extends State<CalendarPage> {
               element.getFieldDescription("pracRegStartDt"),
           begin: DateTime.parse(element.pracRegStartDt ?? ""),
           end: DateTime.parse(element.pracRegEndDt ?? ""),
-          eventColor: eventColors[0],
+          eventColor: eventColor,
         );
         _events.add(calendarEventModel);
       }
@@ -191,7 +192,7 @@ class _CalendarPageState extends State<CalendarPage> {
               element.getFieldDescription("pracExamStartDt"),
           begin: DateTime.parse(element.pracExamStartDt ?? ""),
           end: DateTime.parse(element.pracExamEndDt ?? ""),
-          eventColor: eventColors[0],
+          eventColor: eventColor,
         );
         _events.add(calendarEventModel);
       }
@@ -202,7 +203,7 @@ class _CalendarPageState extends State<CalendarPage> {
               element.getFieldDescription("pracPassDt"),
           begin: DateTime.parse(element.pracPassDt ?? ""),
           end: DateTime.parse(element.pracPassDt ?? ""),
-          eventColor: eventColors[0],
+          eventColor: eventColor,
         );
         _events.add(calendarEventModel);
       }
