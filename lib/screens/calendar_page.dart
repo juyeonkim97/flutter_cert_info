@@ -108,38 +108,39 @@ class _CalendarPageState extends State<CalendarPage> {
   }
 
   Widget listViewWidget() {
-    return ListView.builder(
-        itemCount: _scheduleList.length,
-        itemBuilder: (BuildContext context, int index) {
-          final item = _scheduleList[index];
-          return ExpansionTile(
-            backgroundColor: Colors.white,
-            textColor: eventColors[0],
-            title: Text(item.getFieldDescription('implSeq'),
-                style:
-                    const TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
-            children: <Widget>[
-              ListTile(
-                  title: Text(
-                      '${item.getFieldDescription('docRegStartDt')} : ${item.docRegStartDt} ~ ${item.docRegEndDt}')),
-              ListTile(
-                  title: Text(
-                      '${item.getFieldDescription('docExamStartDt')} : ${item.docExamStartDt} ~ ${item.docExamEndDt}')),
-              ListTile(
-                  title: Text(
-                      '${item.getFieldDescription('docPassDt')} : ${item.docPassDt}')),
-              ListTile(
-                  title: Text(
-                      '${item.getFieldDescription('pracRegStartDt')} : ${item.pracRegStartDt} ~ ${item.pracRegEndDt}')),
-              ListTile(
-                  title: Text(
-                      '${item.getFieldDescription('pracExamStartDt')} : ${item.pracExamStartDt} ~ ${item.pracExamEndDt}')),
-              ListTile(
-                  title: Text(
-                      '${item.getFieldDescription('pracPassDt')} : ${item.pracPassDt}')),
-            ],
-          );
-        });
+    return Container(
+        color: Colors.white,
+        child: ListView.builder(
+            itemCount: _scheduleList.length,
+            itemBuilder: (BuildContext context, int index) {
+              final item = _scheduleList[index];
+              return ExpansionTile(
+                textColor: eventColors[0],
+                title: Text(item.getFieldDescription('implSeq'),
+                    style: const TextStyle(
+                        fontSize: 18, fontWeight: FontWeight.w500)),
+                children: <Widget>[
+                  ListTile(
+                      title: Text(
+                          '${item.getFieldDescription('docRegStartDt')} : ${item.docRegStartDt} ~ ${item.docRegEndDt}')),
+                  ListTile(
+                      title: Text(
+                          '${item.getFieldDescription('docExamStartDt')} : ${item.docExamStartDt} ~ ${item.docExamEndDt}')),
+                  ListTile(
+                      title: Text(
+                          '${item.getFieldDescription('docPassDt')} : ${item.docPassDt}')),
+                  ListTile(
+                      title: Text(
+                          '${item.getFieldDescription('pracRegStartDt')} : ${item.pracRegStartDt} ~ ${item.pracRegEndDt}')),
+                  ListTile(
+                      title: Text(
+                          '${item.getFieldDescription('pracExamStartDt')} : ${item.pracExamStartDt} ~ ${item.pracExamEndDt}')),
+                  ListTile(
+                      title: Text(
+                          '${item.getFieldDescription('pracPassDt')} : ${item.pracPassDt}')),
+                ],
+              );
+            }));
   }
 
   Widget calendarWidget() {
