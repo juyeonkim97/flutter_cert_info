@@ -2,6 +2,7 @@ import 'package:cr_calendar/cr_calendar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cert_info/models/cert_schedule.dart';
 import 'package:flutter_cert_info/models/cert_type.dart';
+import 'package:flutter_cert_info/widgets/ad_banner_widget.dart';
 import 'package:flutter_cert_info/widgets/calendar_widget.dart';
 
 import '../providers/cert_schedule_providers.dart';
@@ -76,7 +77,8 @@ class _CalendarPageState extends State<CalendarPage> {
             ? const Center(
                 child: CircularProgressIndicator(),
               )
-            : Stack(
+            : Container(
+                child: Stack(
                 children: [
                   Visibility(
                     visible: _showCalendar,
@@ -89,7 +91,11 @@ class _CalendarPageState extends State<CalendarPage> {
                     child: _listWidget(),
                   ),
                 ],
-              ));
+              )),
+        bottomSheet: SizedBox(
+          height: 50,
+          child: const AdBannerWidget(),
+        ));
   }
 
   Future _fetchCertSchedule(String jmcd) async {
