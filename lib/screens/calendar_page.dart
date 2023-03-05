@@ -112,24 +112,34 @@ class _CalendarPageState extends State<CalendarPage> {
                     style: const TextStyle(
                         fontSize: 18, fontWeight: FontWeight.w500)),
                 children: <Widget>[
-                  ListTile(
-                      title: Text(
-                          '${item.getFieldDescription('docRegStartDt')} : ${item.docRegStartDt} ~ ${item.docRegEndDt}')),
-                  ListTile(
-                      title: Text(
-                          '${item.getFieldDescription('docExamStartDt')} : ${item.docExamStartDt} ~ ${item.docExamEndDt}')),
-                  ListTile(
-                      title: Text(
-                          '${item.getFieldDescription('docPassDt')} : ${item.docPassDt}')),
-                  ListTile(
-                      title: Text(
-                          '${item.getFieldDescription('pracRegStartDt')} : ${item.pracRegStartDt} ~ ${item.pracRegEndDt}')),
-                  ListTile(
-                      title: Text(
-                          '${item.getFieldDescription('pracExamStartDt')} : ${item.pracExamStartDt} ~ ${item.pracExamEndDt}')),
-                  ListTile(
-                      title: Text(
-                          '${item.getFieldDescription('pracPassDt')} : ${item.pracPassDt}')),
+                  if (item.docRegStartDt != '')
+                    ListTile(
+                        title: Text(
+                            '${item.getFieldDescription('docRegStartDt')} : ${item.docRegStartDt} ~ ${item.docRegEndDt}')),
+                  if (item.addDocRegStartDt != null)
+                    ListTile(
+                        title: Text(
+                            '${item.getFieldDescription('addDocRegStartDt')} : ${item.addDocRegStartDt} ~ ${item.addDocRegEndDt}')),
+                  if (item.docExamStartDt != '')
+                    ListTile(
+                        title: Text(
+                            '${item.getFieldDescription('docExamStartDt')} : ${item.docExamStartDt} ~ ${item.docExamEndDt}')),
+                  if (item.docPassDt != '')
+                    ListTile(
+                        title: Text(
+                            '${item.getFieldDescription('docPassDt')} : ${item.docPassDt}')),
+                  if (item.pracRegStartDt != '')
+                    ListTile(
+                        title: Text(
+                            '${item.getFieldDescription('pracRegStartDt')} : ${item.pracRegStartDt} ~ ${item.pracRegEndDt}')),
+                  if (item.pracExamStartDt != '')
+                    ListTile(
+                        title: Text(
+                            '${item.getFieldDescription('pracExamStartDt')} : ${item.pracExamStartDt} ~ ${item.pracExamEndDt}')),
+                  if (item.pracPassDt != '')
+                    ListTile(
+                        title: Text(
+                            '${item.getFieldDescription('pracPassDt')} : ${item.pracPassDt}')),
                 ],
               );
             }));
@@ -147,7 +157,18 @@ class _CalendarPageState extends State<CalendarPage> {
           name: element.getFieldDescription("implSeq") +
               element.getFieldDescription("docRegStartDt"),
           begin: DateTime.parse(element.docRegStartDt ?? ""),
-          end: DateTime.parse(element.docExamEndDt ?? ""),
+          end: DateTime.parse(element.docRegEndDt ?? ""),
+          eventColor: eventColor,
+        );
+        _events.add(calendarEventModel);
+      }
+      // 필기 빈자리 원서접수
+      if (element.addDocRegStartDt != null) {
+        var calendarEventModel = CalendarEventModel(
+          name: element.getFieldDescription("implSeq") +
+              element.getFieldDescription("addDocRegStartDt"),
+          begin: DateTime.parse(element.addDocRegStartDt ?? ""),
+          end: DateTime.parse(element.addDocRegEndDt ?? ""),
           eventColor: eventColor,
         );
         _events.add(calendarEventModel);

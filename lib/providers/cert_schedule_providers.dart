@@ -6,7 +6,6 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import '../models/cert_schedule.dart';
 
 class CertScheduleProviders {
-
   final url = "http://apis.data.go.kr/B490007/qualExamSchd/getQualExamSchdList";
   final dio = Dio();
 
@@ -71,8 +70,67 @@ class CertScheduleProviders {
     // ''';
     var jsonResponse = jsonDecode(result.toString());
     final response = CertScheduleResponse.fromJson(jsonResponse);
-    var items = response.getItems();
+    var items = _updateDuplicateObject(response.getItems());
+
     items.sort((a, b) => a.implSeq.compareTo(b.implSeq));
     return items;
+  }
+
+  List<CertSchedule> _updateDuplicateObject(List<CertSchedule> list) {
+    List<dynamic> filteredItems = [];
+    List<CertSchedule> duplicateItems = []; // 중복되는 애들 모아뒀다가 다시 조립할 것임
+
+    for (final item in list) {
+      final implSeq = item.implSeq;
+
+      final matchingItem = filteredItems.firstWhere(
+        (element) => element.implSeq == implSeq,
+        orElse: () => null, // 빈 객체를 반환하도록 수정
+      );
+
+      if (matchingItem != null) {
+        duplicateItems.add(matchingItem);
+
+        filteredItems.remove(matchingItem);
+        filteredItems.add(item);
+      } else {
+        filteredItems.add(item);
+      }
+    }
+
+    if (duplicateItems.isNotEmpty) {
+      duplicateItems.sort(
+          (a, b) => a.docRegStartDt?.compareTo(b.docRegStartDt ?? '') ?? 0);
+
+      var updateDocRegEndDt = duplicateItems.first.docRegEndDt;
+      var updateAddDocRegStartDt = duplicateItems.last.docRegStartDt;
+      var updateAddDocRegEndDt = duplicateItems.last.docRegEndDt;
+      var duplicateImplSeq = duplicateItems.first.implSeq;
+      CertSchedule updateItem = filteredItems
+          .firstWhere((element) => element.implSeq == duplicateImplSeq);
+      var newItem = CertSchedule(
+          implYy: updateItem.implYy,
+          implSeq: updateItem.implSeq,
+          docRegStartDt: updateItem.docRegStartDt,
+          docRegEndDt: updateDocRegEndDt,
+          addDocRegStartDt: updateAddDocRegStartDt,
+          addDocRegEndDt: updateAddDocRegEndDt,
+          docExamStartDt: updateItem.docExamStartDt,
+          docExamEndDt: updateItem.docExamEndDt,
+          docPassDt: updateItem.docPassDt,
+          pracRegStartDt: updateItem.pracRegStartDt,
+          pracRegEndDt: updateItem.pracRegEndDt,
+          pracExamStartDt: updateItem.pracExamStartDt,
+          pracExamEndDt: updateItem.pracExamEndDt,
+          pracPassDt: updateItem.pracPassDt
+      );
+
+      // // 기존에 있던 거 지우고
+      filteredItems.remove(updateItem);
+      // // 새로 만든 거 넣어줌
+      filteredItems.add(newItem);
+    }
+
+    return filteredItems.cast<CertSchedule>();
   }
 }

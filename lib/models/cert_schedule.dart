@@ -62,8 +62,10 @@ class CertSchedule {
   final String? qualgbCd;
   final String? qualgbNm;
   final String? description;
-  final String? docRegStartDt;
-  final String? docRegEndDt;
+  late String? docRegStartDt;
+  late String? docRegEndDt;
+  final String? addDocRegStartDt;
+  final String? addDocRegEndDt;
   final String? docExamStartDt;
   final String? docExamEndDt;
   final String? docPassDt;
@@ -81,6 +83,8 @@ class CertSchedule {
     this.description,
     this.docRegStartDt,
     this.docRegEndDt,
+    this.addDocRegStartDt,
+    this.addDocRegEndDt,
     this.docExamStartDt,
     this.docExamEndDt,
     this.docPassDt,
@@ -100,6 +104,8 @@ class CertSchedule {
       description: json['description'],
       docRegStartDt: json['docRegStartDt'],
       docRegEndDt: json['docRegEndDt'],
+      addDocRegStartDt: json['addDocRegStartDt'],
+      addDocRegEndDt: json['addDocRegEndDt'],
       docExamStartDt: json['docExamStartDt'],
       docExamEndDt: json['docExamEndDt'],
       docPassDt: json['docPassDt'],
@@ -117,22 +123,16 @@ class CertSchedule {
         return '제${implSeq}회 ';
       case 'docRegStartDt':
         return '필기 원서접수';
-      // case 'docRegEndDt':
-      //   return '필기 원서접수 종료';
+      case 'addDocRegStartDt':
+        return '필기 빈자리 원서접수';
       case 'docExamStartDt':
         return '필기 시험';
-      // case 'docExamEndDt':
-      //   return '필기 시험 종료';
       case 'docPassDt':
         return '필기 합격자 발표';
       case 'pracRegStartDt':
         return '실기 원서접수';
-      // case 'pracRegEndDt':
-      //   return '실기 원서접수 종료';
       case 'pracExamStartDt':
         return '실기 시험';
-      // case 'pracExamEndDt':
-      //   return '실기 시험 종료';
       case 'pracPassDt':
         return '실기 합격자 발표';
     }
