@@ -6,6 +6,7 @@ import 'package:flutter_cert_info/widgets/week_days_widget.dart';
 
 import '../res/colors.dart';
 import '../utills/constants.dart';
+import 'ad_banner_widget.dart';
 import 'day_events_bottom_sheet.dart';
 import 'day_item_widget.dart';
 import 'event_widget.dart';
@@ -70,20 +71,28 @@ class _CalendarWidgetState extends State<CalendarWidget> {
           ),
 
           /// Calendar view.
-          Expanded(
-              child: CrCalendar(
-            firstDayOfWeek: WeekDay.sunday,
-            eventsTopPadding: 32,
-            initialDate: _currentDate,
-            maxEventLines: 3,
-            controller: _controller,
-            forceSixWeek: true,
-            dayItemBuilder: (builderArgument) =>
-                DayItemWidget(properties: builderArgument),
-            weekDaysBuilder: (day) => WeekDaysWidget(day: day),
-            eventBuilder: (drawer) => EventWidget(drawer: drawer),
-            onDayClicked: _showDayEventsInModalSheet,
-          )),
+          Container(
+              height: MediaQuery.of(context).size.height * 0.8,
+              child: Column(children: [
+                Expanded(
+                    child: CrCalendar(
+                  firstDayOfWeek: WeekDay.sunday,
+                  eventsTopPadding: 32,
+                  initialDate: _currentDate,
+                  maxEventLines: 3,
+                  controller: _controller,
+                  forceSixWeek: true,
+                  dayItemBuilder: (builderArgument) =>
+                      DayItemWidget(properties: builderArgument),
+                  weekDaysBuilder: (day) => WeekDaysWidget(day: day),
+                  eventBuilder: (drawer) => EventWidget(drawer: drawer),
+                  onDayClicked: _showDayEventsInModalSheet,
+                )),
+                SizedBox(
+                  height: 50,
+                  child: const AdBannerWidget(),
+                )
+              ]))
         ]));
   }
 
