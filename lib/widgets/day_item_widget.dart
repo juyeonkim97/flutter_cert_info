@@ -26,7 +26,7 @@ class DayItemWidget extends StatelessWidget {
               height: 19,
               width: 19,
               decoration: BoxDecoration(
-                color: properties.isCurrentDay ? violet : Colors.transparent,
+                color: properties.isCurrentDay ? Colors.black54 : Colors.transparent,
                 shape: BoxShape.circle,
               ),
               child: Center(
@@ -34,7 +34,7 @@ class DayItemWidget extends StatelessWidget {
                     style: TextStyle(
                         color: properties.isCurrentDay
                             ? Colors.white
-                            : violet
+                            : Colors.black54
                                 .withOpacity(properties.isInMonth ? 1 : 0.5))),
               ),
             ),
@@ -47,7 +47,7 @@ class DayItemWidget extends StatelessWidget {
                   style: TextStyle(
                       fontSize: 10,
                       color:
-                          violet.withOpacity(properties.isInMonth ? 1 : 0.5))),
+                      Colors.black54.withOpacity(properties.isInMonth ? 1 : 0.5))),
             ),
         ],
       ),

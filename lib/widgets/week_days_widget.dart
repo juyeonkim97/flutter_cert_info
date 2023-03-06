@@ -24,7 +24,7 @@ class WeekDaysWidget extends StatelessWidget {
           style: TextStyle(
             color: isSunday()
                 ? Colors.red.withOpacity(0.9)
-                : violet.withOpacity(0.9),
+                : Colors.black54.withOpacity(0.9),
           ),
         ),
       ),

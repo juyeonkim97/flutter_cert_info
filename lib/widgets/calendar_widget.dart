@@ -59,7 +59,7 @@ class _CalendarWidgetState extends State<CalendarWidget> {
                 _viewDate,
                 // _controller.date.format(kMonthFormat),
                 style: const TextStyle(
-                    fontSize: 16, color: violet, fontWeight: FontWeight.w600),
+                    fontSize: 16, color: Colors.black87, fontWeight: FontWeight.w600),
               ),
               IconButton(
                 icon: const Icon(Icons.arrow_forward_ios),
