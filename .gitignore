@@ -133,3 +133,4 @@ app.*.symbols
 
 # custom
 .env
+/android/keystore
