@@ -99,7 +99,11 @@ class _CalendarPageState extends State<CalendarPage> {
                     child: _listWidget(),
                   ),
                 ],
-              )));
+              )),
+        bottomSheet: SizedBox(
+          height: 50,
+          child: const AdBannerWidget(),
+        ));
   }
 
   Future<void> _loadSelectedCertType() async {
@@ -124,58 +128,49 @@ class _CalendarPageState extends State<CalendarPage> {
   }
 
   Widget _listWidget() {
-    return Column(
-      children: [
-        Container(
-            height: MediaQuery.of(context).size.height * 0.8,
-            color: Colors.white,
-            child: ListView.builder(
-                itemCount: _schedules.length,
-                itemBuilder: (BuildContext context, int index) {
-                  final item = _schedules[index];
-                  return ExpansionTile(
-                    textColor: eventColors[index % 6],
-                    title: Text(item.getFieldDescription('implSeq'),
-                        style: const TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.w500)),
-                    children: <Widget>[
-                      if (item.docRegStartDt != '')
-                        ListTile(
-                            title: Text(
-                                '${item.getFieldDescription('docRegStartDt')} : ${item.docRegStartDt} ~ ${item.docRegEndDt}')),
-                      if (item.addDocRegStartDt != null)
-                        ListTile(
-                            title: Text(
-                                '${item.getFieldDescription('addDocRegStartDt')} : ${item.addDocRegStartDt} ~ ${item.addDocRegEndDt}')),
-                      if (item.docExamStartDt != '')
-                        ListTile(
-                            title: Text(
-                                '${item.getFieldDescription('docExamStartDt')} : ${item.docExamStartDt} ~ ${item.docExamEndDt}')),
-                      if (item.docPassDt != '')
-                        ListTile(
-                            title: Text(
-                                '${item.getFieldDescription('docPassDt')} : ${item.docPassDt}')),
-                      if (item.pracRegStartDt != '')
-                        ListTile(
-                            title: Text(
-                                '${item.getFieldDescription('pracRegStartDt')} : ${item.pracRegStartDt} ~ ${item.pracRegEndDt}')),
-                      if (item.pracExamStartDt != '')
-                        ListTile(
-                            title: Text(
-                                '${item.getFieldDescription('pracExamStartDt')} : ${item.pracExamStartDt} ~ ${item.pracExamEndDt}')),
-                      if (item.pracPassDt != '')
-                        ListTile(
-                            title: Text(
-                                '${item.getFieldDescription('pracPassDt')} : ${item.pracPassDt}')),
-                    ],
-                  );
-                })),
-        const SizedBox(
-          height: 50,
-          child: AdBannerWidget(),
-        )
-      ],
-    );
+    return Container(
+        color: Colors.white,
+        child: ListView.builder(
+            itemCount: _schedules.length,
+            itemBuilder: (BuildContext context, int index) {
+              final item = _schedules[index];
+              return ExpansionTile(
+                textColor: eventColors[index % 6],
+                title: Text(item.getFieldDescription('implSeq'),
+                    style: const TextStyle(
+                        fontSize: 18, fontWeight: FontWeight.w500)),
+                children: <Widget>[
+                  if (item.docRegStartDt != '')
+                    ListTile(
+                        title: Text(
+                            '${item.getFieldDescription('docRegStartDt')} : ${item.docRegStartDt} ~ ${item.docRegEndDt}')),
+                  if (item.addDocRegStartDt != null)
+                    ListTile(
+                        title: Text(
+                            '${item.getFieldDescription('addDocRegStartDt')} : ${item.addDocRegStartDt} ~ ${item.addDocRegEndDt}')),
+                  if (item.docExamStartDt != '')
+                    ListTile(
+                        title: Text(
+                            '${item.getFieldDescription('docExamStartDt')} : ${item.docExamStartDt} ~ ${item.docExamEndDt}')),
+                  if (item.docPassDt != '')
+                    ListTile(
+                        title: Text(
+                            '${item.getFieldDescription('docPassDt')} : ${item.docPassDt}')),
+                  if (item.pracRegStartDt != '')
+                    ListTile(
+                        title: Text(
+                            '${item.getFieldDescription('pracRegStartDt')} : ${item.pracRegStartDt} ~ ${item.pracRegEndDt}')),
+                  if (item.pracExamStartDt != '')
+                    ListTile(
+                        title: Text(
+                            '${item.getFieldDescription('pracExamStartDt')} : ${item.pracExamStartDt} ~ ${item.pracExamEndDt}')),
+                  if (item.pracPassDt != '')
+                    ListTile(
+                        title: Text(
+                            '${item.getFieldDescription('pracPassDt')} : ${item.pracPassDt}')),
+                ],
+              );
+            }));
   }
 
   void _createEventModels() {
