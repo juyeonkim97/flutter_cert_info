@@ -4,6 +4,7 @@ import 'package:flutter_cert_info/models/cert_schedule.dart';
 import 'package:flutter_cert_info/models/cert_type.dart';
 import 'package:flutter_cert_info/widgets/ad_banner_widget.dart';
 import 'package:flutter_cert_info/widgets/calendar_widget.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../providers/cert_schedule_providers.dart';
 import '../providers/cert_type_provider.dart';
@@ -24,24 +25,29 @@ class _CalendarPageState extends State<CalendarPage> {
   final CertScheduleProviders _certScheduleProviders = CertScheduleProviders();
   final CertTypeProvider certTypeProvider = CertTypeProvider();
 
-  late String _selectedCertType;
+  late String _selectedJmFldNm;
+  late String _selectedJmCd;
   late List<CertSchedule> _schedules;
   late Widget _calendarWidget;
+  late var prefs;
 
   List<CertType> _certTypeList = [];
   List<CalendarEventModel> _events = [];
   bool _isLoading = true;
   bool _showCalendar = true;
 
+  Future<void> _fetchData() async {
+    await _loadSelectedCertType().then((value) => _fetchCertSchedule(_selectedJmCd));
+  }
+
   @override
   void initState() {
-    super.initState();
-    _selectedCertType = _initialCertType.jmfldnm;
-    _fetchCertSchedule(_initialCertType.jmcd).then((_) {
+    _fetchData().then((_) {
       setState(() {
         _isLoading = false;
       });
     });
+    super.initState();
   }
 
   @override
@@ -67,7 +73,9 @@ class _CalendarPageState extends State<CalendarPage> {
             ),
             title: Row(
               children: [
-                Text(_selectedCertType),
+                _isLoading
+                    ? CircularProgressIndicator()
+                    : Text(_selectedJmFldNm),
                 IconButton(
                     icon: Icon(Icons.arrow_drop_down),
                     onPressed: _showCertTypeListInModalSheet),
@@ -94,7 +102,21 @@ class _CalendarPageState extends State<CalendarPage> {
               )));
   }
 
-  Future _fetchCertSchedule(String jmcd) async {
+  Future<void> _loadSelectedCertType() async {
+    prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _selectedJmFldNm =
+          prefs.getString('selectedJmFldNm') ?? _initialCertType.jmfldnm;
+      _selectedJmCd = prefs.getString('selectedJmCd') ?? _initialCertType.jmcd;
+    });
+  }
+
+  Future<void> _saveSelectedCertType(String jmfldnm, String jmcd) async {
+    await prefs.setString('selectedJmFldNm', jmfldnm);
+    await prefs.setString('selectedJmCd', jmcd);
+  }
+
+  Future<void> _fetchCertSchedule(String jmcd) async {
     _schedules =
         await _certScheduleProviders.fetchCertSchedule(_currentDate.year, jmcd);
     _createEventModels();
@@ -262,11 +284,13 @@ class _CalendarPageState extends State<CalendarPage> {
   }
 
   void onTap(CertType item) {
-    if (_selectedCertType != item.jmfldnm) {
+    if (_selectedJmFldNm != item.jmfldnm) {
       setState(() {
         _isLoading = true;
-        _selectedCertType = item.jmfldnm;
+        _selectedJmFldNm = item.jmfldnm;
+        _selectedJmCd = item.jmcd;
       });
+      _saveSelectedCertType(_selectedJmFldNm, _selectedJmCd);
       _fetchCertSchedule(item.jmcd).then((_) {
         setState(() {
           _isLoading = false;

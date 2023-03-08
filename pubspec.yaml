@@ -42,7 +42,8 @@ dependencies:
   flutter_dotenv: ^5.0.2
   cr_calendar: ^1.0.0+1
   google_mobile_ads: ^1.0.1
-
+  shared_preferences: ^2.0.18
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter
