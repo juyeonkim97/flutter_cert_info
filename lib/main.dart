@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_cert_info/screens/calendar_page.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");
-
-  MobileAds.instance.initialize();
 
   runApp(MyApp());
 }
@@ -35,6 +32,7 @@ class MyApp extends StatelessWidget {
     );
 
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
         primarySwatch: white,
