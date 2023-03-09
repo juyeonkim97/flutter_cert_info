@@ -6,12 +6,12 @@ class AdHelper {
 
   static String get bannerAdUnitId {
     if (!kReleaseMode) {
-      return 'ca-app-pub-3940256099942544/6300978111';
+      return dotenv.env['TEST_BANNER_UNIT_ID'];
     }
     if (Platform.isAndroid) {
-      return 'ca-app-pub-3216336784534816/4188846193';
+      return dotenv.env['ANDROID_BANNER_UNIT_ID'];
     } else if (Platform.isIOS) {
-      return 'ca-app-pub-3940256099942544/2934735716'; // TODO 변경 필요
+      return dotenv.env['IOS_BANNER_UNIT_ID']; // TODO 변경 필요
     } else {
       throw new UnsupportedError('Unsupported platform');
     }
