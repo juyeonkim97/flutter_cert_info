@@ -51,8 +51,8 @@ android {
         targetSdkVersion flutter.targetSdkVersion
 
         applicationId "com.juyeon.cert.info"
-        versionCode 1
-        versionName "1.0"
+        versionCode flutterVersionCode.toInteger()
+        versionName flutterVersionName
     }
 
     signingConfigs {
